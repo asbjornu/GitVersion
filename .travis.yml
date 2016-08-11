@@ -9,6 +9,8 @@ addons:
   - mkdocs
 before_install:
   - git fetch --unshallow # Travis always does a shallow clone, but GitVersion needs the full history including branches and tags
+  - git branch --list
+  - git ls-remote --heads origin
 script:
   - ./build.sh
 cache:
