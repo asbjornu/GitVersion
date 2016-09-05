@@ -46,6 +46,7 @@ matrix:
 before_install:
   - git fetch --unshallow # Travis always does a shallow clone, but GitVersion needs the full history including branches and tags
   - git fetch --all
+  - git branch --all
 script:
   - ./build.sh
 cache:
