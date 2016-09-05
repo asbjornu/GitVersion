@@ -2,9 +2,47 @@ language: csharp
 sudo: false
 mono:
   - latest
+  - 4.4.2
+  - 4.4.1
+  - 4.4.0
+  - 4.2.3
+  - 4.2.2
+  - 4.2.1
+  - 4.2.0
+  - 4.0.5
+  - 4.0.4.4
+  - 4.0.4
+  - 4.2.0
+  - 4.0.3
+  - 4.0.2
+  - 4.0.1
+  - 4.0.0
 os:
   - linux
   - osx
+matrix:
+  include:
+    - os: linux
+    - os: linux
+      dist: trusty
+    - os: osx
+      osx_image: beta-xcode6.1
+    - os: osx
+      osx_image: beta-xcode6.2
+    - os: osx
+      osx_image: beta-xcode6.3
+    - os: osx
+      osx_image: xcode6.4
+    - os: osx
+      osx_image: xcode7
+    - os: osx
+      osx_image: xcode7.1
+    - os: osx
+      osx_image: xcode7.2
+    - os: osx
+      osx_image: xcode7.3
+    - os: osx
+      osx_image: xcode8
 before_install:
   - git fetch --unshallow # Travis always does a shallow clone, but GitVersion needs the full history including branches and tags
 script:
