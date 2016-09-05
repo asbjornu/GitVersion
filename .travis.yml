@@ -44,7 +44,8 @@ matrix:
     - os: osx
       osx_image: xcode8
 before_install:
-  - git fetch --all --unshallow # Travis always does a shallow clone, but GitVersion needs the full history including branches and tags
+  - git fetch --unshallow # Travis always does a shallow clone, but GitVersion needs the full history including branches and tags
+  - git fetch --all
 script:
   - ./build.sh
 cache:
