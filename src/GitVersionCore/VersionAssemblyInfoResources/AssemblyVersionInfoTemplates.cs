@@ -5,8 +5,7 @@
     using System.IO;
     using System.Linq;
     using GitVersionCore.Extensions;
-    using JetBrains.Annotations;
-
+    
     public class AssemblyVersionInfoTemplates
     {
         static readonly IDictionary<string, FileInfo> assemblyInfoSourceList;
@@ -38,7 +37,7 @@
             return null;
         }
 
-        public static string GetAssemblyInfoAddFormatFor([NotNull] string fileExtension)
+        public static string GetAssemblyInfoAddFormatFor(string fileExtension)
         {
             if (fileExtension == null)
                 throw new ArgumentNullException("fileExtension");
@@ -50,7 +49,7 @@
             return assemblyInfoAddFormat;
         }
 
-        public static bool IsSupported([NotNull] string fileExtension)
+        public static bool IsSupported(string fileExtension)
         {
             if (fileExtension == null)
                 throw new ArgumentNullException("fileExtension");
