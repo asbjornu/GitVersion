@@ -31,6 +31,7 @@ namespace GitVersionCore.Tests.IntegrationTests
             fixture.AssertFullSemver("0.2.0-alpha.0", config);
             Console.WriteLine(fixture.SequenceDiagram.GetDiagram());
             var local = fixture.CloneRepository();
+            fixture.BranchTo("master", config, repository: local.Repository)
             fixture.AssertFullSemver("0.2.0-alpha.0", config, repository: local.Repository);
             local.Repository.DumpGraph();
         }
