@@ -127,11 +127,23 @@ namespace GitVersion.VersionCalculation
             var mainlineBranchConfigs = context.FullConfiguration.Branches.Where(b => b.Value.IsMainline == true).ToList();
             var mainlineBranches = repositoryMetadataProvider.GetMainlineBranches(context.CurrentCommit, mainlineBranchConfigs);
 
+            if (!mainlineBranches.Any())
+            {
+                var mainlineBranchConfigsString = string.Join(", ", mainlineBranchConfigs.Select(b => b.Value.Name));
+                throw new WarningException($"No branches can be found matching the commit {context.CurrentCommit.Sha} in the configured Mainline branches: {mainlineBranchConfigsString}");
+            }
+
             var allMainlines = mainlineBranches.Values.SelectMany(branches => branches.Select(b => b.FriendlyName));
-            log.Info("Found possible mainline branches: " + string.Join(", ", allMainlines));
+            var allMainlinesString = string.Join(", ", allMainlines);
+            log.Info($"Found possible mainline branches: {allMainlinesString}");
 
             // Find closest mainline branch
-            var firstMatchingCommit = context.CurrentBranch.Commits.First(c => mainlineBranches.ContainsKey(c.Sha));
+            var firstMatchingCommit = context.CurrentBranch.Commits.FirstOrDefault(c => mainlineBranches.ContainsKey(c.Sha));
+            if (firstMatchingCommit == null)
+            {
+                throw new WarningException($"The branch '{context.CurrentBranch}' does not share any commits with the configured Mainline branch(es): {allMainlinesString}");
+            }
+
             var possibleMainlineBranches = mainlineBranches[firstMatchingCommit.Sha];
 
             if (possibleMainlineBranches.Count == 1)
