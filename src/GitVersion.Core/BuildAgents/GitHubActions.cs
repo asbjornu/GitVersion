@@ -39,7 +39,7 @@ namespace GitVersion.BuildAgents
             // The outgoing environment variables must be written to a temporary file (identified by the $GITHUB_ENV environment
             // variable, which changes for every step in a workflow) which is then parsed. That file must also be UTF-8 or it will fail.
 
-            if (writer == null || !updateBuildNumber)
+            if (writer == null)
             {
                 return;
             }
@@ -49,14 +49,12 @@ namespace GitVersion.BuildAgents
             if (gitHubSetEnvFilePath != null)
             {
                 writer($"Writing version variables to $GITHUB_ENV file for '{GetType().Name}'.");
-                using (var streamWriter = File.AppendText(gitHubSetEnvFilePath)) // Already uses UTF-8 as required by GitHub
+                using var streamWriter = File.AppendText(gitHubSetEnvFilePath);
+                foreach (var variable in variables)
                 {
-                    foreach (var variable in variables)
+                    if (!string.IsNullOrEmpty(variable.Value))
                     {
-                        if (!string.IsNullOrEmpty(variable.Value))
-                        {
-                            streamWriter.WriteLine($"GitVersion_{variable.Key}={variable.Value}");
-                        }
+                        streamWriter.WriteLine($"GitVersion_{variable.Key}={variable.Value}");
                     }
                 }
             }

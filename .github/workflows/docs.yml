@@ -1,11 +1,20 @@
-name: Verify Documentation
+name: Verify & Publish Documentation
 
-on: [push, pull_request]
+on:
+  workflow_dispatch:
+  push:
+    paths:
+    - 'docs/**'
+  pull_request:
+    paths:
+    - 'docs/**'
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_USERNAME: ${{ secrets.GITHUB_USERNAME }}
     steps:
     - uses: actions/checkout@v2
       with:
@@ -20,3 +29,13 @@ jobs:
       with:
         directory: ./artifacts/Documentation
         arguments: --url-ignore /api/ --allow-hash-href --assume-extension --disable-external
+
+    - name: '[Publish Documentation]'
+      if: ${{ github.event_name == 'push' }}
+      shell: pwsh
+      run: ./build.ps1 -target Publish-Documentation
+
+    - name: '[Publish Documentation]'
+      if: ${{ github.event_name == 'workflow_dispatch' }}
+      shell: pwsh
+      run: ./build.ps1 -target Force-Publish-Documentation -exclusive

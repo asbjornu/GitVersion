@@ -7,6 +7,7 @@ using GitVersion.MsBuild.Tests.Helpers;
 using GitVersion.Core.Tests.Helpers;
 using LibGit2Sharp;
 using Microsoft.Build.Utilities.ProjectCreation;
+using System.IO;
 
 namespace GitVersion.MsBuild.Tests.Tasks
 {
@@ -42,19 +43,44 @@ namespace GitVersion.MsBuild.Tests.Tasks
             return result;
         }
 
-        protected static MsBuildTaskFixtureResult<T> ExecuteMsBuildTaskInBuildServer<T>(T task) where T : GitVersionTaskBase
+        protected static MsBuildTaskFixtureResult<T> ExecuteMsBuildTaskInAzurePipeline<T>(T task, string buildNumber = null, string configurationText = null) where T : GitVersionTaskBase
         {
             var fixture = CreateRemoteRepositoryFixture();
             task.SolutionDirectory = fixture.LocalRepositoryFixture.RepositoryPath;
-
             var msbuildFixture = new MsBuildTaskFixture(fixture);
-            msbuildFixture.WithEnv(env.ToArray());
+            var environmentVariables = new List<KeyValuePair<string, string>>(env.ToArray());
+            if (buildNumber != null)
+            {
+                environmentVariables.Add(new KeyValuePair<string, string>("BUILD_BUILDNUMBER", buildNumber));
+            }
+            msbuildFixture.WithEnv(environmentVariables.ToArray());
+            if (configurationText != null)
+            {
+                CreateConfiguration(task.SolutionDirectory, configurationText);
+            }
+
             var result = msbuildFixture.Execute(task);
+
             if (result.Success == false) Console.WriteLine(result.Log);
             return result;
         }
 
-        protected static MsBuildExeFixtureResult ExecuteMsBuildExeInBuildServer(Action<ProjectCreator> extendProject)
+        protected static MsBuildTaskFixtureResult<T> ExecuteMsBuildTaskInGitHubActions<T>(T task, string envFilePath) where T : GitVersionTaskBase
+        {
+            var fixture = CreateRemoteRepositoryFixture();
+            task.SolutionDirectory = fixture.LocalRepositoryFixture.RepositoryPath;
+            var msbuildFixture = new MsBuildTaskFixture(fixture);
+            msbuildFixture.WithEnv(
+                new KeyValuePair<string, string>("GITHUB_ACTIONS", "true"),
+                new KeyValuePair<string, string>("GITHUB_ENV", envFilePath)
+            );
+            var result = msbuildFixture.Execute(task);
+            if (result.Success == false)
+                Console.WriteLine(result.Log);
+            return result;
+        }
+
+        protected static MsBuildExeFixtureResult ExecuteMsBuildExeInAzurePipeline(Action<ProjectCreator> extendProject)
         {
             var fixture = CreateRemoteRepositoryFixture();
 
@@ -90,6 +116,12 @@ namespace GitVersion.MsBuild.Tests.Tasks
             fixture.LocalRepositoryFixture.Repository.Branches.Remove(MainBranch);
             fixture.InitializeRepo();
             return fixture;
+        }
+
+        private static void CreateConfiguration(string repoFolder, string content)
+        {
+            var configFilePath = Path.Combine(repoFolder, Configuration.ConfigFileLocator.DefaultFileName);
+            File.WriteAllText(configFilePath, content);
         }
     }
 }
