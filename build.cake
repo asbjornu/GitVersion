@@ -104,11 +104,17 @@ Teardown<BuildParameters>((context, parameters) =>
         {
             Information("Starting Teardown...");
 
-            Information("Repository info : IsMainRepo {0}, IsMainBranch {1}, IsTagged: {2}, IsPullRequest: {3}",
+            Information("Repository info: IsMainRepo {0}, IsMainBranch {1}, IsTagged: {2}, IsPullRequest: {3}",
                 parameters.IsMainRepo,
                 parameters.IsMainBranch,
                 parameters.IsTagged,
                 parameters.IsPullRequest);
+
+            var toolsPath = context.Configuration.GetToolPath(context.Environment.WorkingDirectory, context.Environment);
+
+            Information("Tools Path: {0}", toolsPath);
+
+            CleanDirectories(toolsPath.ToString());
 
             Information("Finished running tasks.");
         }
