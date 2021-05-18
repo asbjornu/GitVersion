@@ -57,8 +57,8 @@ namespace GitVersion
 
         private int RunGitVersionTool(GitVersionOptions gitVersionOptions)
         {
-            var mutexName = gitVersionOptions.WorkingDirectory.Replace(Path.DirectorySeparatorChar.ToString(), "");
-            using var mutex = new Mutex(true, $@"Global\{mutexName}", out var acquired);
+            var mutexName = repositoryInfo.DotGitDirectory.Replace(Path.DirectorySeparatorChar.ToString(), "");
+            using var mutex = new Mutex(true, $@"Global\gitversion{mutexName}", out var acquired);
 
             try
             {
