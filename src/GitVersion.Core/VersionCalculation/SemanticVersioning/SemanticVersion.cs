@@ -323,12 +323,4 @@ namespace GitVersion
             return incremented;
         }
     }
-
-    public enum VersionField
-    {
-        None,
-        Patch,
-        Minor,
-        Major
-    }
 }
