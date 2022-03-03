@@ -101,6 +101,13 @@ public class ArgumentParserTests : TestBase
     }
 
     [Test]
+    public void MissingOutputShouldThrow()
+    {
+        var exception = Assert.Throws<WarningException>(() => this.argumentParser.ParseArguments("targetDirectoryPath -output"));
+        exception.Message.ShouldBe("Value 'invalid_value' cannot be parsed as output type, please use 'json', 'file' or 'buildserver'");
+    }
+
+    [Test]
     public void OutputDefaultsToJson()
     {
         var arguments = this.argumentParser.ParseArguments("targetDirectoryPath");
